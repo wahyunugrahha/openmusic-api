@@ -1,0 +1,5 @@
+# Folder node_modules
+node_modules/
+
+# File environment (kalau ada)
+.env
