@@ -20,7 +20,7 @@ class AlbumService {
       throw new InvariantError('Gagal menambahkan album');
     }
 
-    return result.rows.map(mapDBToModelAlbum)[0];
+    return result.rows[0].id;
   }
 }
 
