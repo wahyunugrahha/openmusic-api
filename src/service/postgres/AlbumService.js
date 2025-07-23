@@ -1,7 +1,7 @@
 const { Pool } = require('pg');
-const NotFoundError = require('../../error/not-found-error');
 const { mapDBToModelAlbum } = require('../../utils/utils');
 const { nanoid } = require('nanoid');
+const InvariantError = require('../../error/invariant-error');
 
 class AlbumService {
   constructor() {
@@ -17,7 +17,7 @@ class AlbumService {
 
     const result = await this._pool.query(query);
     if (!result.rows.length) {
-      throw new NotFoundError('Album tidak ditemukan');
+      throw new InvariantError('Gagal menambahkan album');
     }
 
     return result.rows.map(mapDBToModelAlbum)[0];
