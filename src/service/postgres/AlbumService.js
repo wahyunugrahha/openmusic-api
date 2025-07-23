@@ -1,6 +1,7 @@
-const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
 const NotFoundError = require('../../error/not-found-error');
+const { mapDBToModelAlbum } = require('../../utils/utils');
+const { nanoid } = require('nanoid');
 
 class AlbumService {
   constructor() {
@@ -19,7 +20,7 @@ class AlbumService {
       throw new NotFoundError('Album tidak ditemukan');
     }
 
-    return result.rows.map(mapDBToModel)[0];
+    return result.rows.map(mapDBToModelAlbum)[0];
   }
 }
 

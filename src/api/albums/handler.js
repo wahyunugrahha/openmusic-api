@@ -13,7 +13,7 @@ class AlbumsHandler {
 
     const response = h.response({
       status: 'success',
-      message: 'Albunm berhasil ditambahkan',
+      message: 'Album berhasil ditambahkan',
       data: {
         albumId,
       },
