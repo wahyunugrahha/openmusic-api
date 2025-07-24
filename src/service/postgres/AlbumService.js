@@ -31,7 +31,7 @@ class AlbumService {
     };
     const result = await this._pool.query(query);
     if (!result.rows.length) {
-      throw new NotFoundError('Catatan tidak ditemukan');
+      throw new NotFoundError('Album tidak ditemukan');
     }
     return result.rows.map(mapDBToModel)[0];
   }
@@ -45,7 +45,20 @@ class AlbumService {
     const result = await this._pool.query(query);
 
     if (!result.rows.length) {
-      throw new NotFoundError('Gagal memperbarui catatan. Id tidak ditemukan');
+      throw new NotFoundError('Gagal memperbarui album. Id tidak ditemukan');
+    }
+  }
+
+  async deleteAlbumById(id) {
+    const query = {
+      text: 'DELETE FROM albums WHERE id = $1 RETURNING id',
+      values: [id],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      throw new NotFoundError('Album gagal dihapus. Id tidak ditemukan');
     }
   }
 }
