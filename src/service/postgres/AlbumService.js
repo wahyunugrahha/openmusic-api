@@ -1,5 +1,5 @@
 const { Pool } = require('pg');
-const { mapDBToModel } = require('../../utils/utils');
+const { mapAlbumDBToModel } = require('../../utils/utils-albums');
 const { nanoid } = require('nanoid');
 const InvariantError = require('../../error/invariant-error');
 const NotFoundError = require('../..//error/not-found-error');
@@ -33,7 +33,7 @@ class AlbumService {
     if (!result.rows.length) {
       throw new NotFoundError('Album tidak ditemukan');
     }
-    return result.rows.map(mapDBToModel)[0];
+    return result.rows.map(mapAlbumDBToModel)[0];
   }
 
   async editAlbumById(id, { name, year }) {
