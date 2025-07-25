@@ -3,12 +3,14 @@ class SongsHandler {
     this._service = service;
     this._validator = validator;
 
-    this.addSongHandler = this.addSongHandler.bind(this);
+    this.postSongHandler = this.postSongHandler.bind(this);
     this.getSongsHandler = this.getSongsHandler.bind(this);
     this.getSongByIdHandler = this.getSongByIdHandler.bind(this);
+    this.putSongByIdHandler = this.putSongByIdHandler.bind(this);
+    this.deleteSongByIdHandler = this.deleteSongByIdHandler.bind(this);
   }
 
-  async addSongHandler(request, h) {
+  async postSongHandler(request, h) {
     this._validator.validateCreatePayload(request.payload);
     const { title, year, genre, performer, duration, albumId } =
       request.payload;
@@ -50,6 +52,26 @@ class SongsHandler {
       data: {
         song,
       },
+    };
+  }
+  async putSongByIdHandler(request) {
+    this._validator.validateCreatePayload(request.payload);
+    const { id } = request.params;
+
+    await this._service.editSongById(id, request.payload);
+
+    return {
+      status: 'success',
+      message: 'Lagu berhasil diperbarui',
+    };
+  }
+  async deleteSongByIdHandler(request) {
+    const { id } = request.params;
+    await this._service.deleteSongById(id);
+
+    return {
+      status: 'success',
+      message: 'Lagu berhasil dihapus',
     };
   }
 }
