@@ -3,10 +3,11 @@ require('dotenv').config();
 const Hapi = require('@hapi/hapi');
 const albums = require('./api/albums');
 const AlbumsValidator = require('./validator/albums/albums-validation');
-const AlbumService = require('./service/postgres/AlbumService');
+const AlbumService = require('./service/postgres/album-service');
+
 const ClientError = require('./error/client-error');
 const songs = require('./api/songs');
-const SongService = require('./service/postgres/SongService');
+const SongService = require('./service/postgres/song-service');
 const SongsValidator = require('./validator/songs/songs-validation');
 
 const init = async () => {
@@ -55,10 +56,10 @@ const init = async () => {
         return h.continue;
       }
 
-      console.error(response); 
+      console.error(response);
       const newResponse = h.response({
         status: 'error',
-        message: 'terjadi kegagalan pada server kami', 
+        message: 'terjadi kegagalan pada server kami',
       });
       newResponse.code(500);
       return newResponse;
