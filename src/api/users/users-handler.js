@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 class UsersHandler {
   constructor(service, validator) {
     this._service = service;
@@ -21,7 +20,7 @@ class UsersHandler {
 
     const response = h.response({
       status: 'success',
-      message: 'User berhasil ditambahkan',
+      message: 'User berhasil dibuat',
       data: {
         userId,
       },

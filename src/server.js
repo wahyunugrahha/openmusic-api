@@ -1,18 +1,34 @@
 require('dotenv').config();
 
 const Hapi = require('@hapi/hapi');
+const Jwt = require('@hapi/jwt');
+
+// Albums
 const albums = require('./api/albums');
 const AlbumsValidator = require('./validator/albums/albums-validation');
 const AlbumService = require('./service/postgres/album-service');
 
-const ClientError = require('./error/client-error');
+// Songs
 const songs = require('./api/songs');
 const SongService = require('./service/postgres/song-service');
 const SongsValidator = require('./validator/songs/songs-validation');
 
+// ErrorHandling
+const ClientError = require('./error/client-error');
+
+// Authentications
+const authentications = require('./api/authentications');
+const AuthenticationsService = require('./service/postgres/authentications-service');
+const AuthenticationsValidator = require('./validator/authentications/authentications-validation');
+const TokenManager = require('./tokenize/token-manager');
+const UsersService = require('./service/postgres/user-service');
+
 const init = async () => {
   const songService = new SongService();
   const albumServices = new AlbumService(songService);
+  const usersService = new UsersService();
+  const authenticationsService = new AuthenticationsService();
+
   const server = Hapi.server({
     port: process.env.PORT,
     host: process.env.HOST,
@@ -22,6 +38,30 @@ const init = async () => {
       },
     },
   });
+
+  await server.register([
+    {
+      plugin: Jwt,
+    },
+  ]);
+
+  // mendefinisikan strategy autentikasi jwt
+  server.auth.strategy('notesapp_jwt', 'jwt', {
+    keys: process.env.ACCESS_TOKEN_KEY,
+    verify: {
+      aud: false,
+      iss: false,
+      sub: false,
+      maxAgeSec: process.env.ACCESS_TOKEN_AGE,
+    },
+    validate: (artifacts) => ({
+      isValid: true,
+      credentials: {
+        id: artifacts.decoded.payload.id,
+      },
+    }),
+  });
+
   await server.register([
     {
       plugin: albums,
@@ -35,6 +75,15 @@ const init = async () => {
       options: {
         service: songService,
         validator: SongsValidator,
+      },
+    },
+    {
+      plugin: authentications,
+      options: {
+        authenticationsService,
+        usersService,
+        tokenManager: TokenManager,
+        validator: AuthenticationsValidator,
       },
     },
   ]);
