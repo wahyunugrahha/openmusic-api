@@ -15,13 +15,16 @@ const SongsValidator = require('./validator/songs/songs-validation');
 
 // ErrorHandling
 const ClientError = require('./error/client-error');
+// User
+const users = require('./api/users');
+const UsersService = require('./service/postgres/user-service');
+const UsersValidator = require('./validator/users/users-validation');
 
 // Authentications
 const authentications = require('./api/authentications');
 const AuthenticationsService = require('./service/postgres/authentications-service');
 const AuthenticationsValidator = require('./validator/authentications/authentications-validation');
 const TokenManager = require('./tokenize/token-manager');
-const UsersService = require('./service/postgres/user-service');
 
 const init = async () => {
   const songService = new SongService();
@@ -75,6 +78,13 @@ const init = async () => {
       options: {
         service: songService,
         validator: SongsValidator,
+      },
+    },
+    {
+      plugin: users,
+      options: {
+        service: usersService,
+        validator: UsersValidator,
       },
     },
     {
