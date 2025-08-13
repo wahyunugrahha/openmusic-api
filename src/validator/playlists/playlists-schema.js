@@ -4,4 +4,4 @@ const createPlaylistValidation = Joi.object({
   name: Joi.string().required(),
 });
 
-module.exports = createPlaylistValidation;
+module.exports = {createPlaylistValidation};

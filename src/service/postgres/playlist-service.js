@@ -1,5 +1,5 @@
 const { Pool } = require('pg');
-const nanoid = require('nanoid');
+const { nanoid } = require('nanoid');
 const InvariantError = require('../../error/invariant-error');
 
 class PlaylistService {

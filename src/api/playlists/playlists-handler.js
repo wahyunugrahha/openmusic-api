@@ -2,6 +2,8 @@ class PlaylistsHandler {
   constructor(service, validator) {
     this._service = service;
     this._validator = validator;
+
+    this.postPlaylistHandler = this.postPlaylistHandler.bind(this);
   }
 
   async postPlaylistHandler(request, h) {
