@@ -5,8 +5,9 @@ const NotFoundError = require('../../error/not-found-error');
 const AuthorizationError = require('../../error/authorization-error');
 
 class PlaylistService {
-  constructor() {
+  constructor(collaborationService) {
     this._pool = new Pool();
+    this._collaborationService = collaborationService;
   }
   async addPlaylist({ name, owner }) {
     const id = nanoid(16);
@@ -23,15 +24,17 @@ class PlaylistService {
     return result.rows[0].id;
   }
 
-  async getPlaylists(ownerId) {
+  async getPlaylists(userId) {
     const query = {
       text: `
         SELECT p.id, p.name, u.username
         FROM playlists p
         JOIN users u ON u.id = p.owner
-        WHERE p.owner = $1
+        LEFT JOIN collaborations c ON c.playlist_id = p.id
+        WHERE p.owner = $1 OR c.user_id = $1
+        GROUP BY p.id, p.name, u.username
       `,
-      values: [ownerId],
+      values: [userId],
     };
 
     const result = await this._pool.query(query);
@@ -69,7 +72,15 @@ class PlaylistService {
   }
 
   async verifyPlaylistAccess(playlistId, userId) {
-    await this.verifyPlaylistOwner(playlistId, userId);
+    try {
+      await this.verifyPlaylistOwner(playlistId, userId);
+    } catch (error) {
+      try {
+        await this._collaborationService.verifyCollaborator(playlistId, userId);
+      } catch {
+        throw error;
+      }
+    }
   }
 
   async verifySongId(songId) {
@@ -94,7 +105,7 @@ class PlaylistService {
   }
 
   async getSongsFromPlaylist(playlistId) {
-    // header playlist 
+    // header playlist
     const headerQuery = {
       text: `
         SELECT p.id, p.name, u.username
@@ -126,8 +137,21 @@ class PlaylistService {
       id,
       name,
       username,
-      songs: songsResult.rows, 
+      songs: songsResult.rows,
     };
+  }
+  
+  async deleteSongFromPlaylist(playlistId, songId) {
+    const query = {
+      text: 'DELETE FROM playlist_songs WHERE playlist_id = $1 AND song_id = $2 RETURNING id',
+      values: [playlistId, songId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      throw new InvariantError('Lagu gagal dihapus dari playlist');
+    }
   }
 }
 
