@@ -40,7 +40,7 @@ const routes = (handler) => [
     },
   },
   {
-    method: 'DELEtE',
+    method: 'DELETE',
     path: '/playlists/{id}/songs',
     handler: handler.deleteSongFromPlaylistHandler,
     options: {
