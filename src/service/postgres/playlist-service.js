@@ -5,9 +5,10 @@ const NotFoundError = require('../../error/not-found-error');
 const AuthorizationError = require('../../error/authorization-error');
 
 class PlaylistService {
-  constructor(collaborationService) {
+  constructor(collaborationService, activitiesService) {
     this._pool = new Pool();
     this._collaborationService = collaborationService;
+    this._activitiesService = activitiesService;
   }
   async addPlaylist({ name, owner }) {
     const id = nanoid(16);
@@ -93,15 +94,26 @@ class PlaylistService {
     if (!result.rows.length) throw new NotFoundError('Lagu tidak ditemukan');
   }
 
-  async addSongToPlaylist(playlistId, songId) {
-    const id = `playlistsong-${nanoid(16)}`;
+  async addSongToPlaylist(playlistId, songId, userId) {
+    const id = nanoid(16);
     const query = {
-      text: 'INSERT INTO playlist_songs (id, playlist_id, song_id) VALUES ($1, $2, $3) RETURNING id',
+      text: 'INSERT INTO playlist_songs VALUES($1, $2, $3) RETURNING id',
       values: [id, playlistId, songId],
     };
     const result = await this._pool.query(query);
-    if (!result.rows.length)
+    if (!result.rows.length) {
       throw new InvariantError('Lagu gagal ditambahkan ke playlist');
+    }
+
+    // catat aktivitas
+    if (this._activitiesService) {
+      await this._activitiesService.addActivity({
+        playlistId,
+        songId,
+        userId,
+        action: 'add',
+      });
+    }
   }
 
   async getSongsFromPlaylist(playlistId) {
@@ -140,17 +152,24 @@ class PlaylistService {
       songs: songsResult.rows,
     };
   }
-  
-  async deleteSongFromPlaylist(playlistId, songId) {
+
+  async deleteSongFromPlaylist(playlistId, songId, userId) {
     const query = {
       text: 'DELETE FROM playlist_songs WHERE playlist_id = $1 AND song_id = $2 RETURNING id',
       values: [playlistId, songId],
     };
-
     const result = await this._pool.query(query);
-
     if (!result.rows.length) {
       throw new InvariantError('Lagu gagal dihapus dari playlist');
+    }
+
+    if (this._activitiesService) {
+      await this._activitiesService.addActivity({
+        playlistId,
+        songId,
+        userId,
+        action: 'delete',
+      });
     }
   }
 }
