@@ -20,7 +20,6 @@ exports.up = (pgm) => {
     },
   });
 
-  // cegah duplikasi lagu yang sama dalam playlist yang sama
   pgm.addConstraint(
     'playlist_songs',
     'unique_playlist_song_pair',
