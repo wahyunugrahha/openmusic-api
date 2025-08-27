@@ -5,9 +5,10 @@ const InvariantError = require('../../error/invariant-error');
 const NotFoundError = require('../../error/not-found-error');
 
 class AlbumService {
-  constructor(songService) {
+  constructor(songService, storageService) {
     this._pool = new Pool();
     this._songService = songService;
+    this._storageService = storageService;
   }
   async addAlbum({ name, year }) {
     const id = nanoid(16);
@@ -63,6 +64,37 @@ class AlbumService {
 
     if (!result.rows.length) {
       throw new NotFoundError('Album gagal dihapus. Id tidak ditemukan');
+    }
+  }
+
+  async getAlbumCoverByAlbumId(id) {
+    const query = {
+      text: 'SELECT cover_url FROM albums WHERE id = $1',
+      values: [id],
+    };
+    const result = await this._pool.query(query);
+    return result.rows[0];
+  }
+
+  async updateAlbumCover(id, filename) {
+    const { cover_url: oldCoverFilename } = await this.getAlbumCoverByAlbumId(
+      id
+    );
+
+    if (oldCoverFilename) {
+      this._storageService.deleteFile(oldCoverFilename);
+    }
+
+    const query = {
+      text: 'UPDATE albums SET cover_url = $1 WHERE id = $2 RETURNING id',
+      values: [filename, id],
+    };
+
+    const result = await this._pool.query(query);
+    if (!result.rows.length) {
+      throw new NotFoundError(
+        'Gagal memperbarui sampul album. Id tidak ditemukan'
+      );
     }
   }
 }

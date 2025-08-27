@@ -21,6 +21,13 @@ class StorageService {
       file.on('end', () => resolve(filename));
     });
   }
+
+  deleteFile(filename) {
+    const path = `${this._folder}/${filename}`;
+    if (fs.existsSync(path)) {
+      fs.unlinkSync(path);
+    }
+  }
 }
 
 module.exports = StorageService;

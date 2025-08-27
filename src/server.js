@@ -52,8 +52,11 @@ const UploadsValidator = require('./validator/uploads/upload-validation.js');
 const StorageService = require('./service/storage/storage-service.js');
 
 const init = async () => {
+  const storageService = new StorageService(
+    path.resolve(__dirname, 'api/uploads/file/images')
+  );
   const songService = new SongService();
-  const albumServices = new AlbumService(songService);
+  const albumServices = new AlbumService(songService, storageService); // Pass storageService to AlbumService
   const usersService = new UsersService();
   const authenticationsService = new AuthenticationsService();
   const collaborationsService = new CollaborationService();
@@ -61,9 +64,6 @@ const init = async () => {
   const playlistsService = new PlaylistService(
     collaborationsService,
     playlistActivitiesService
-  );
-  const storageService = new StorageService(
-    path.resolve(__dirname, 'api/uploads/file/images')
   );
 
   const server = Hapi.server({
@@ -166,6 +166,7 @@ const init = async () => {
       options: {
         service: storageService,
         validator: UploadsValidator,
+        albumService: albumServices,
       },
     },
   ]);
