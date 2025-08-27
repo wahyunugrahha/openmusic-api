@@ -51,12 +51,21 @@ const uploads = require('./api/uploads');
 const UploadsValidator = require('./validator/uploads/upload-validation.js');
 const StorageService = require('./service/storage/storage-service.js');
 
+// AlbumLikes
+const albumLikes = require('./api/albumlikes');
+const AlbumLikesService = require('./service/postgres/albumlike-service.js');
+
 const init = async () => {
   const storageService = new StorageService(
     path.resolve(__dirname, 'api/uploads/file/images')
   );
   const songService = new SongService();
-  const albumServices = new AlbumService(songService, storageService); // Pass storageService to AlbumService
+  const albumLikesService = new AlbumLikesService();
+  const albumServices = new AlbumService(
+    songService,
+    storageService,
+    albumLikesService
+  );
   const usersService = new UsersService();
   const authenticationsService = new AuthenticationsService();
   const collaborationsService = new CollaborationService();
@@ -166,6 +175,13 @@ const init = async () => {
       options: {
         service: storageService,
         validator: UploadsValidator,
+        albumService: albumServices,
+      },
+    },
+    {
+      plugin: albumLikes,
+      options: {
+        service: albumLikesService,
         albumService: albumServices,
       },
     },

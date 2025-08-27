@@ -5,10 +5,11 @@ const InvariantError = require('../../error/invariant-error');
 const NotFoundError = require('../../error/not-found-error');
 
 class AlbumService {
-  constructor(songService, storageService) {
+  constructor(songService, storageService, albumLikesService) {
     this._pool = new Pool();
     this._songService = songService;
     this._storageService = storageService;
+    this._albumLikesService = albumLikesService;
   }
   async addAlbum({ name, year }) {
     const id = nanoid(16);
@@ -37,6 +38,9 @@ class AlbumService {
     }
     const album = result.rows.map(mapAlbumDBToModel)[0];
     album.songs = await this._songService.getSongsByAlbumId(id);
+
+    const { count } = await this._albumLikesService.getAlbumLikes(id);
+    album.likes = count;
 
     return album;
   }
