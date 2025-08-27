@@ -56,6 +56,7 @@ class AlbumService {
     if (!result.rows.length) {
       throw new NotFoundError('Gagal memperbarui album. Id tidak ditemukan');
     }
+    await this._albumLikesService._cacheService.delete(`album_likes:${id}`);
   }
 
   async deleteAlbumById(id) {
@@ -69,6 +70,7 @@ class AlbumService {
     if (!result.rows.length) {
       throw new NotFoundError('Album gagal dihapus. Id tidak ditemukan');
     }
+    await this._albumLikesService._cacheService.delete(`album_likes:${id}`);
   }
 
   async getAlbumCoverByAlbumId(id) {
@@ -100,6 +102,7 @@ class AlbumService {
         'Gagal memperbarui sampul album. Id tidak ditemukan'
       );
     }
+    await this._albumLikesService._cacheService.delete(`album_likes:${id}`);
   }
 }
 

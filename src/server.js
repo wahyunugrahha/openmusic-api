@@ -55,12 +55,16 @@ const StorageService = require('./service/storage/storage-service.js');
 const albumLikes = require('./api/albumlikes');
 const AlbumLikesService = require('./service/postgres/albumlike-service.js');
 
+// Caching
+const CacheService = require('./service/redis/cache-service.js');
+
 const init = async () => {
+  const cacheService = new CacheService();
   const storageService = new StorageService(
     path.resolve(__dirname, 'api/uploads/file/images')
   );
   const songService = new SongService();
-  const albumLikesService = new AlbumLikesService();
+  const albumLikesService = new AlbumLikesService(cacheService);
   const albumServices = new AlbumService(
     songService,
     storageService,

@@ -4,8 +4,8 @@ const routes = require('./albumlikes-routes');
 module.exports = {
   name: 'albumlikes',
   version: '1.0.0',
-  register: async (server, { service, albumService, validator }) => {
-    const handler = new AlbumLikesHandler(service, albumService, validator);
+  register: async (server, { service, albumService }) => {
+    const handler = new AlbumLikesHandler(service, albumService);
     server.route(routes(handler));
   },
 };
