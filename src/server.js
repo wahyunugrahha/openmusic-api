@@ -60,8 +60,7 @@ const CacheService = require('./service/redis/cache-service.js');
 
 const init = async () => {
   const cacheService = new CacheService();
-  await cacheService.connect(); 
-  
+
   const storageService = new StorageService(
     path.resolve(__dirname, 'api/uploads/file/images')
   );

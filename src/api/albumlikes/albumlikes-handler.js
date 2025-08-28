@@ -12,7 +12,7 @@ class AlbumLikesHandler {
     const { id: credentialId } = request.auth.credentials;
     const { id: albumId } = request.params;
 
-    await this._albumService.getAlbumById(albumId);
+    await this._albumService.verifyAlbumExists(albumId);
     await this._service.addAlbumLike(credentialId, albumId);
 
     const response = h.response({
@@ -28,7 +28,7 @@ class AlbumLikesHandler {
     const { id: credentialId } = request.auth.credentials;
     const { id: albumId } = request.params;
 
-    await this._albumService.getAlbumById(albumId);
+    await this._albumService.verifyAlbumExists(albumId);
     await this._service.deleteAlbumLike(credentialId, albumId);
 
     return {
@@ -40,7 +40,7 @@ class AlbumLikesHandler {
   async getAlbumLikesHandler(request, h) {
     const { id: albumId } = request.params;
 
-    await this._albumService.getAlbumById(albumId);
+    await this._albumService.verifyAlbumExists(albumId);
     const { count, source } = await this._service.getAlbumLikes(albumId);
 
     const response = h.response({
