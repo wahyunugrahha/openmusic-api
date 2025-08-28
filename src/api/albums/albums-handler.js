@@ -24,10 +24,17 @@ class AlbumsHandler {
     response.code(201);
     return response;
   }
-
   async getAlbumByIdHandler(request) {
     const { id } = request.params;
     const album = await this._service.getAlbumById(id);
+
+    if (album.coverUrl) {
+      const port = process.env.PORT;
+      album.coverUrl = `http://${
+        request.info.host.split(':')[0]
+      }:${port}/albums/covers/${album.coverUrl}`;
+    }
+
     return {
       status: 'success',
       data: {

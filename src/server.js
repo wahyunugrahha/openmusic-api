@@ -3,6 +3,7 @@ require('dotenv').config();
 const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
 const path = require('path');
+const Inert = require('@hapi/inert');
 
 // Albums
 const albums = require('./api/albums');
@@ -60,7 +61,6 @@ const CacheService = require('./service/redis/cache-service.js');
 
 const init = async () => {
   const cacheService = new CacheService();
-
   const storageService = new StorageService(
     path.resolve(__dirname, 'api/uploads/file/images')
   );
@@ -93,6 +93,9 @@ const init = async () => {
   await server.register([
     {
       plugin: Jwt,
+    },
+    {
+      plugin: Inert,
     },
   ]);
 
