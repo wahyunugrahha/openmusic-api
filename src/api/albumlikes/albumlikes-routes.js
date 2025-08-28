@@ -1,4 +1,3 @@
-// A new file `album-likes/album-likes-routes.js`
 const routes = (handler) => [
   {
     method: 'POST',
