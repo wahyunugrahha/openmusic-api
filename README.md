@@ -79,7 +79,7 @@ Tersedia koleksi **Postman** untuk menguji API v3:
 Gunakan ESLint untuk menjaga konsistensi kode:
 ```bash
 npm run lint
-
+```
 ---
 ## 📌 Lisensi
 Proyek ini dibuat untuk tujuan pembelajaran dan pengembangan API.
